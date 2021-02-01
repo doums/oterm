@@ -28,7 +28,7 @@ function! s:NormalizeConfig()
      endif
 	endfor
   if g:oterm.position !~# 'top|/bottom|\right|\left'
-    g:oterm.position = 'bottom'
+    let g:oterm.position = 'bottom'
   endif
 endfunction
 
