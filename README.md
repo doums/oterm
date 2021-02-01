@@ -52,6 +52,11 @@ You can direclty run a process in the spawned terminal
 :OTerm nnn
 ```
 
+### mapping
+```
+nnoremap <Leader>o <Plug>OTerm
+```
+
 ### vimscript API
 ```
 call oterm#spawn({ 'command': command, 'callback': funcref('s:on_exit'), 'layout': { 'position': 'bottom', 'size': 40, 'min': 10 }, 'name': 'ls' })
