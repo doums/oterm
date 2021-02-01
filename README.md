@@ -1,6 +1,6 @@
 ## OTerm
 
-A [n](https://neovim.io/)/[vim](https://www.vim.org/) plugin to quickly open terminals
+A [neovim](https://neovim.io/) plugin to quickly open terminals.
 
 OTerm is a plugin that allows you to open terminals quickly by placing them according to a layout and in an adaptive way.\
 It also allows you to run external process direclty in the spawned terminal.
@@ -35,7 +35,7 @@ let g:oterm = {
       \}
 ```
 
-`position` The position of the spawned terminal window. Can be one of `top`, `bottom`, `left` and `right`. If top or bottom, the terminal will appear at the top/bottom of the vim's global window, *full width*. For right/left, the terminal will appear at the right/left of the vim's global window, *full height*.
+`position` The position of the spawned terminal window. Can be one of `top`, `bottom`, `left` and `right`. If top or bottom, the terminal will appear at the top/bottom of the vim's global window, **full width**. For right/left, the terminal will appear at the right/left of the vim's global window, **full height**.
 
 `size` The height of the terminal window if `top`/`bottom` or the width if `left`/`right` positions. Expressed as a percentage of the height/width of the vim's global window.
 
