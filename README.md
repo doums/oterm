@@ -54,7 +54,7 @@ You can direclty run a process in the spawned terminal
 
 ### mapping
 ```
-nnoremap <Leader>o <Plug>OTerm
+nmap <Leader>o <Plug>OTerm
 ```
 
 ### vimscript API
