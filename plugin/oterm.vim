@@ -11,9 +11,9 @@ endif
 let g:oterm_loaded = 1
 
 let g:oterm_default = {
-      \  'position': 'left',
+      \  'position': 'bottom',
       \  'size': 40,
-      \  'min': 40,
+      \  'min': 10,
       \  'tab': 0
       \}
 
