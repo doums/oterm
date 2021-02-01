@@ -114,8 +114,7 @@ function oterm#restore_window(bufname)
   if &buftype != 'terminal'
     return
   endif
-  let terminal = s:find_term(a:bufname)
-  if empty(terminal)
+  if !s:any_term(a:bufname)
     return
   endif
   if exists('s:laststatus')
