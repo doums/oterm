@@ -67,19 +67,20 @@ function! s:set_win(terminal)
     let s:laststatus = &laststatus
     set laststatus=0
   else
-    if layout.position == 'top'
+    let pos = get(layout, 'position', 'bottom')
+    if pos == 'top'
       let position = 'K'
-    elseif layout.position == 'bottom'
+    elseif pos == 'bottom'
       let position = 'J'
-    elseif layout.position == 'left'
+    elseif pos == 'left'
       let position = 'H'
-    elseif layout.position == 'right'
+    elseif pos == 'right'
       let position = 'L'
     endif
     if mode() != 't'
       execute "normal \<C-w>".position
     endif
-    if layout.position =~? 'top\|bottom'
+    if pos =~? 'top\|bottom'
       execute "resize ".layout.size
       let s:laststatus = &laststatus
       set laststatus=0
@@ -97,6 +98,7 @@ function oterm#init_window(bufname)
   if empty(terminal)
     return
   endif
+  echo ''
   call s:set_win(terminal)
   let s:showmode = &showmode
   let s:ruler = &ruler
@@ -156,34 +158,40 @@ function oterm#spawn(...)
     return
   endif
   if a:0 > 0
-    let layout = get(a:1, 'layout', g:oterm_default)
+    let layout = get(a:1, 'layout', g:oterm)
   else
-    let layout = g:oterm_default
+    let layout = g:oterm
   endif
-  if layout.position =~? 'top\|bottom'
-    let max_size = &lines
+  if get(layout, 'tab')
+    let terminal.layout = { 'tab': 1 }
   else
-    let max_size = &columns
+    if layout.position =~? 'top\|bottom'
+      let max_size = &lines
+    else
+      let max_size = &columns
+    endif
+    let size = float2nr(floor(max_size * (layout.size / 100.0)))
+    if size >= layout.min
+      new
+      let terminal.layout = { 'size': size, 'position': layout.position, 'tab': 0 }
+    else
+      tabnew
+      let terminal.layout = { 'tab': 1 }
+    endif
   endif
-  let size = float2nr(floor(max_size * (layout.size / 100.0)))
-  let tab_mod = 0
-  if size >= layout.min
-    new
-  else
-    tabnew
-    let tab_mod = 1
-  endif
-  let terminal.layout = { 'size': size, 'position': layout.position, 'tab': tab_mod }
   if a:0 > 0
-    let command = get(a:1, 'command')
-    let jobid = termopen(command, { "on_exit": "oterm#on_exit" })
+    let command = get(a:1, 'command', split(&shell))
+    if empty(command)
+      let command = split(&shell)
+    endif
     let Cb = get(a:1, 'callback')
     if !empty(Cb)
       let terminal.cb = Cb
     endif
   else
-    let jobid = termopen(split(&shell))
+    let command = split(&shell)
   endif
+  let jobid = termopen(command, { "on_exit": "oterm#on_exit" })
   if a:0 > 0 && has_key(a:1, 'name')
     let name = s:find_valid_name(a:1.name)
   else
@@ -196,6 +204,13 @@ function oterm#spawn(...)
   call add(s:terminals, terminal)
   call oterm#init_window(bufname())
   startinsert
+endfunction
+
+function oterm#new(...)
+  if a:0 > 0
+    let command = split(a:1)
+  endif
+  call oterm#spawn({ 'command': command, 'layout': g:oterm })
 endfunction
 
 function s:Print_err(msg)
