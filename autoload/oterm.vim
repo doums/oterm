@@ -163,6 +163,7 @@ function oterm#spawn(...)
     let layout = g:oterm
   endif
   if get(layout, 'tab')
+    tabnew
     let terminal.layout = { 'tab': 1 }
   else
     if layout.position =~? 'top\|bottom'
