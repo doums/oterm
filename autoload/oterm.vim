@@ -5,7 +5,7 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-if exists("g:oterm_autoloaded")
+if exists('g:oterm_autoloaded')
   finish
 endif
 let g:oterm_autoloaded = 1
@@ -56,11 +56,11 @@ function! s:any_term(bufname)
   return 0
 endfunction
 
-function! s:term_index(jobid)
+function! s:term_index(bufnr)
   if !empty(s:terminals)
     let index = 0
     while index < len(s:terminals)
-      if s:terminals[index].jobid == a:jobid
+      if s:terminals[index].bufnr == a:bufnr
         return index
       endif
       let index = index + 1
@@ -142,10 +142,10 @@ function! oterm#restore_window(bufname)
   endif
 endfunction
 
-function! oterm#on_exit(job_id, status, ...)
-  let term_idx = s:term_index(a:job_id)
+function! s:on_exit(job, status, ...)
+  let term_idx = s:term_index(bufnr())
   if term_idx == -1
-    return
+    throw 'on_exit callback: terminal data not found for bufnr '.bufnr()
   endif
   let terminal = s:terminals[term_idx]
   call win_gotoid(terminal.prev_winid)
@@ -186,9 +186,27 @@ function! s:create_window(layout)
   throw 'Invalid layout!'
 endfunction
 
+function! s:create_term(command, bufname)
+  if has('nvim')
+    call termopen(a:command, { 'on_exit': funcref('s:on_exit') })
+    execute 'file '.a:bufname
+    let bufnr = bufnr()
+    startinsert
+  else
+    let bufnr = term_start(a:command, {
+          \ 'curwin': 1,
+          \ 'term_name': a:bufname,
+          \ 'exit_cb': funcref('s:on_exit'),
+          \ 'term_finish': 'close',
+          \ 'term_kill': 'SIGKILL'
+          \ })
+  endif
+  return bufnr
+endfunction
+
 function! oterm#spawn(...)
   if a:0 > 0 && type(a:1) != 4
-    call s:Print_err('oterm#new_term, wrong argument type, expected a dictionary')
+    call s:print_err('oterm#new_term, wrong argument type, expected a dictionary')
     return
   endif
   let terminal = { 'prev_winid': win_getid() }
@@ -212,24 +230,11 @@ function! oterm#spawn(...)
     endif
   endif
   call s:create_window(layout)
-  if has('nvim')
-    let jobid = termopen(command, { "on_exit": "oterm#on_exit" })
-    execute "file ".name
-  else
-    let jobid = term_start(a:command, {
-          \ "curwin": 1,
-          \ "term_name": name,
-          \ "exit_cb": "oterm#on_exit",
-          \ "term_finish": "close",
-          \ "term_kill": "SIGKILL"
-          \ })
-  endif
-  startinsert
-  call setbufvar(bufnr(), '&filetype', 'oterm')
+  let bufnr = s:create_term(command, name)
+  call setbufvar(bufnr, '&filetype', 'oterm')
   let terminal.layout = layout
-  let terminal.jobid = jobid
   let terminal.bufname = name
-  let terminal.bufnr = bufnr()
+  let terminal.bufnr = bufnr
   call add(s:terminals, terminal)
   call oterm#init_window(bufname())
 endfunction
@@ -242,7 +247,7 @@ function! oterm#new(...)
   call oterm#spawn(opt)
 endfunction
 
-function! s:Print_err(msg)
+function! s:print_err(msg)
   echohl ErrorMsg
   echom a:msg
   echohl None
