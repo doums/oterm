@@ -57,7 +57,7 @@ nmap <Leader>o <Plug>OTerm
 
 ### vimscript API
 ```
-call oterm#spawn({ 'command': command, 'callback': funcref('s:on_exit'), 'layout': { 'position': 'bottom', 'size': 40, 'min': 10 }, 'name': 'ls' })
+call oterm#spawn({ 'command': 'nnn', 'callback': funcref('s:on_exit'), 'layout': { 'left': 40, 'min': 50 }, 'name': 'nnn' })
 ```
 
 #### `command`
