@@ -183,15 +183,29 @@ function! oterm#on_exit(job_id, status, ...)
 endfunction
 
 function! oterm#spawn(...)
-  let terminal = { 'jobid': 0, 'prev_winid': win_getid() }
   if a:0 > 0 && type(a:1) != 4
     call s:Print_err('oterm#new_term, wrong argument type, expected a dictionary')
     return
   endif
+  let terminal = { 'jobid': 0, 'prev_winid': win_getid() }
+  let layout = g:oterm
+  let command = split(&shell)
+  let name = s:find_valid_name('oterm')
   if a:0 > 0
     let layout = get(a:1, 'layout', g:oterm)
-  else
-    let layout = g:oterm
+    let cmd = get(a:1, 'command')
+    if empty(cmd)
+      let command = split(&shell)
+    else
+      let command = [&shell, &shellcmdflag, cmd]
+    endif
+    let Cb = get(a:1, 'callback')
+    if !empty(Cb)
+      let terminal.cb = Cb
+    endif
+    if has_key(a:1, 'name')
+      let name = s:find_valid_name(a:1.name)
+    endif
   endif
   if get(layout, 'tab')
     tabnew
@@ -213,24 +227,7 @@ function! oterm#spawn(...)
       let terminal.layout = { 'tab': 1 }
     endif
   endif
-  if a:0 > 0
-    let command = get(a:1, 'command', split(&shell))
-    if empty(command)
-      let command = split(&shell)
-    endif
-    let Cb = get(a:1, 'callback')
-    if !empty(Cb)
-      let terminal.cb = Cb
-    endif
-  else
-    let command = split(&shell)
-  endif
   let jobid = termopen(command, { "on_exit": "oterm#on_exit" })
-  if a:0 > 0 && has_key(a:1, 'name')
-    let name = s:find_valid_name(a:1.name)
-  else
-    let name = s:find_valid_name('oterm')
-  endif
   execute "file ".name
   let terminal.jobid = jobid
   let terminal.bufname = name

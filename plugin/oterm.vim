@@ -29,6 +29,7 @@ augroup oterm
 augroup END
 
 command -nargs=* -complete=shellcmd OTerm call oterm#new(<q-args>)
+command -nargs=* -complete=shellcmd Ot call oterm#new(<q-args>)
 noremap <silent> <unique> <script> <Plug>OTerm <SID>OTermMap
 noremap <SID>OTermMap :OTerm<CR>
 
