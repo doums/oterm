@@ -149,7 +149,9 @@ function! oterm#on_exit(job_id, status, ...)
   endif
   let terminal = s:terminals[term_idx]
   call win_gotoid(terminal.prev_winid)
-  execute terminal.bufnr.'bdelete!'
+  if has('nvim')
+    execute terminal.bufnr.'bdelete!'
+  endif
   let i = 0
   if has_key(terminal, 'cb')
     call terminal.cb(a:status)
@@ -210,8 +212,18 @@ function! oterm#spawn(...)
     endif
   endif
   call s:create_window(layout)
-  let jobid = termopen(command, { "on_exit": "oterm#on_exit" })
-  execute "file ".name
+  if has('nvim')
+    let jobid = termopen(command, { "on_exit": "oterm#on_exit" })
+    execute "file ".name
+  else
+    let jobid = term_start(a:command, {
+          \ "curwin": 1,
+          \ "term_name": name,
+          \ "exit_cb": "oterm#on_exit",
+          \ "term_finish": "close",
+          \ "term_kill": "SIGKILL"
+          \ })
+  endif
   startinsert
   call setbufvar(bufnr(), '&filetype', 'oterm')
   let terminal.layout = layout

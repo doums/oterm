@@ -24,8 +24,13 @@ endif
 
 augroup oterm
   autocmd!
-  autocmd BufEnter,TermOpen * call oterm#init_window(expand('<afile>'))
-  autocmd BufLeave,TermClose * call oterm#restore_window(expand('<afile>'))
+  if has('nvim')
+    autocmd BufEnter,TermOpen * call oterm#init_window(expand('<afile>'))
+    autocmd BufLeave,TermClose * call oterm#restore_window(expand('<afile>'))
+  else
+    autocmd TerminalWinOpen,BufEnter * call oterm#init_window(expand('<afile>'))
+    autocmd BufLeave,BufDelete * call oterm#init_window(expand('<afile>'))
+  endif
 augroup END
 
 command -nargs=* -complete=shellcmd OTerm call oterm#new(<q-args>)
