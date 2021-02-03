@@ -35,15 +35,16 @@ let g:oterm = {
 ```
 
 `up`, `down`, `left` or `right` sets the position of the spawned terminal window inside the global vim window. If up or down, the terminal will appear at the top/bottom of vim global window, at **full width**. For right/left, the terminal will appear at the right/left of vim global window, at **full height**.\
-The value is the height or the width of the terminal window respectively for `up`/`down` or `left`/`right` expressed as a percentage of the height/width of vim global window.
+The value is the height or the width of the terminal window respectively for horizontal or vertical split expressed as a percentage of the height/width of vim global window.
 
-`min` The minimum lines or columns, depends of the position again, below which the terminal will be spawned in a new tab.
+`min` The minimum number of lines or columns, depends on wheter splitted horizontally or vertically, below which the terminal will be spawned in a new tab.
 
 `tab` If equal to `1` the terminal will be spawned in a new tab regardless of the other properties.
 
-#### command
+#### commands
 ```
 :OTerm
+:Ot
 ```
 You can direclty run a process in the spawned terminal
 ```
@@ -57,7 +58,7 @@ nmap <Leader>o <Plug>OTerm
 
 ### vimscript API
 ```
-call oterm#spawn({ 'command': 'nnn', 'callback': funcref('s:on_exit'), 'layout': { 'left': 40, 'min': 50 }, 'name': 'nnn' })
+call oterm#spawn({ 'command': ['nnn'], 'callback': funcref('s:on_exit'), 'layout': { 'left': 40, 'min': 50 }, 'name': 'nnn' })
 ```
 
 #### `command`
