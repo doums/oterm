@@ -28,16 +28,14 @@ The configuration is optional.
 " .vimrc/init.vim
 
 let g:oterm = {
-      \  'position': 'bottom',
-      \  'size': 40,
+      \  'down': 40,
       \  'min': 10,
       \  'tab': 0
       \}
 ```
 
-`position` The position of the spawned terminal window. Can be one of `top`, `bottom`, `left` and `right`. If top or bottom, the terminal will appear at the top/bottom of the vim's global window, **full width**. For right/left, the terminal will appear at the right/left of the vim's global window, **full height**.
-
-`size` The height of the terminal window if `top`/`bottom` or the width if `left`/`right` positions. Expressed as a percentage of the height/width of the vim's global window.
+`up`, `down`, `left` or `right` sets the position of the spawned terminal window inside the global vim window. If up or down, the terminal will appear at the top/bottom of vim global window, at **full width**. For right/left, the terminal will appear at the right/left of vim global window, at **full height**.\
+The value is the height or the width of the terminal window respectively for `up`/`down` or `left`/`right` expressed as a percentage of the height/width of vim global window.
 
 `min` The minimum lines or columns, depends of the position again, below which the terminal will be spawned in a new tab.
 

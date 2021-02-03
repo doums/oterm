@@ -5,39 +5,27 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-if exists("g:oterm_loaded")
+if exists('g:oterm_loaded')
   finish
 endif
 let g:oterm_loaded = 1
 
 let g:oterm_default = {
-      \  'position': 'bottom',
-      \  'size': 40,
+      \  'down': 40,
       \  'min': 10,
       \  'tab': 0
       \}
 
-function! s:NormalizeConfig()
-  if !exists("g:oterm") || type(g:oterm) != 4
-    let g:oterm = g:oterm_default
-    return
-  endif
-	for key in keys(g:oterm_default)
-	   if !has_key(g:oterm, key) || type(g:oterm_default[key]) != type(g:oterm[key])
-       let g:oterm[key] = g:oterm_default[key]
-     endif
-	endfor
-  if g:oterm.position !~# 'top|/bottom|\right|\left'
-    let g:oterm.position = 'bottom'
-  endif
-endfunction
-
-call s:NormalizeConfig()
+if !exists('g:oterm')
+  let g:oterm = g:oterm_default
+else
+  call oterm#normalize_conf(g:oterm)
+endif
 
 augroup oterm
   autocmd!
-  autocmd BufEnter,TermOpen * call oterm#init_window(expand("<afile>"))
-  autocmd BufLeave,TermClose * call oterm#restore_window(expand("<afile>"))
+  autocmd BufEnter,TermOpen * call oterm#init_window(expand('<afile>'))
+  autocmd BufLeave,TermClose * call oterm#restore_window(expand('<afile>'))
 augroup END
 
 command -nargs=* -complete=shellcmd OTerm call oterm#new(<q-args>)

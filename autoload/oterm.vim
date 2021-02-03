@@ -12,6 +12,29 @@ let g:oterm_autoloaded = 1
 
 let s:terminals = []
 
+function! oterm#normalize_conf(layout)
+  if type(a:layout) != 4
+    let a:layout = g:oterm_default
+    return
+  endif
+  if !has_key(a:layout, 'up')
+        \ && !has_key(a:layout, 'down')
+        \ && !has_key(a:layout, 'left')
+        \ && !has_key(a:layout, 'right')
+    let a:layout.down = 40
+  endif
+  if !has_key(a:layout, 'min')
+    if has_key(a:layout, 'up') || has_key(a:layout, 'down')
+      let a:layout.min = 10
+    else
+      let a:layout.min = 40
+    endif
+  endif
+  if !has_key(a:layout, 'tab')
+    let a:layout.tab = 0
+  endif
+endfunction
+
 function! s:find_term(bufname)
   if !empty(s:terminals)
     for item in s:terminals
@@ -47,6 +70,15 @@ function! s:term_index(jobid)
   return -1
 endfunction
 
+function! s:get_size(layout) abort
+  for key in keys(a:layout)
+    if key =~# 'up\|down\|left\|right'
+      return a:layout[key]
+    endif
+  endfor
+  throw 'Layout invalid!'
+endfunction
+
 function! s:find_valid_name(name, ...)
   if a:0 == 0
     if !s:any_term(a:name)
@@ -67,20 +99,19 @@ function! s:set_win(terminal)
     let s:laststatus = &laststatus
     set laststatus=0
   else
-    let pos = get(layout, 'position', 'bottom')
-    if pos == 'top'
-      let position = 'K'
-    elseif pos == 'bottom'
-      let position = 'J'
-    elseif pos == 'left'
-      let position = 'H'
-    elseif pos == 'right'
-      let position = 'L'
+    if has_key(layout, 'up')
+      let direction = 'K'
+    elseif has_key(layout, 'down')
+      let direction = 'J'
+    elseif has_key(layout, 'left')
+      let direction = 'H'
+    elseif has_key(layout, 'right')
+      let direction = 'L'
     endif
     if mode() != 't'
-      execute "normal \<C-w>".position
+      execute "normal \<C-w>".direction
     endif
-    if pos =~? 'top\|bottom'
+    if has_key(layout, 'up') || has_key(layout, 'down')
       execute "resize ".layout.size
       let s:laststatus = &laststatus
       set laststatus=0
@@ -90,7 +121,7 @@ function! s:set_win(terminal)
   endif
 endfunction
 
-function oterm#init_window(bufname)
+function! oterm#init_window(bufname)
   if &buftype != 'terminal'
     return
   endif
@@ -112,7 +143,7 @@ function oterm#init_window(bufname)
   setlocal norelativenumber
 endfunction
 
-function oterm#restore_window(bufname)
+function! oterm#restore_window(bufname)
   if &buftype != 'terminal'
     return
   endif
@@ -136,7 +167,7 @@ function oterm#restore_window(bufname)
   endif
 endfunction
 
-function oterm#on_exit(job_id, status, ...)
+function! oterm#on_exit(job_id, status, ...)
   let term_idx = s:term_index(a:job_id)
   if term_idx == -1
     return
@@ -151,7 +182,7 @@ function oterm#on_exit(job_id, status, ...)
   call remove(s:terminals, term_idx)
 endfunction
 
-function oterm#spawn(...)
+function! oterm#spawn(...)
   let terminal = { 'jobid': 0, 'prev_winid': win_getid() }
   if a:0 > 0 && type(a:1) != 4
     call s:Print_err('oterm#new_term, wrong argument type, expected a dictionary')
@@ -166,15 +197,17 @@ function oterm#spawn(...)
     tabnew
     let terminal.layout = { 'tab': 1 }
   else
-    if layout.position =~? 'top\|bottom'
+    if has_key(layout, 'up') || has_key(layout, 'down')
       let max_size = &lines
     else
       let max_size = &columns
     endif
-    let size = float2nr(floor(max_size * (layout.size / 100.0)))
+    let percent = s:get_size(layout)
+    let size = float2nr(floor(max_size * (percent / 100.0)))
     if size >= layout.min
       new
-      let terminal.layout = { 'size': size, 'position': layout.position, 'tab': 0 }
+      let terminal.layout = { 'size': size }
+      call extend(terminal.layout, layout)
     else
       tabnew
       let terminal.layout = { 'tab': 1 }
@@ -207,14 +240,14 @@ function oterm#spawn(...)
   startinsert
 endfunction
 
-function oterm#new(...)
+function! oterm#new(...)
   if a:0 > 0
     let command = split(a:1)
   endif
   call oterm#spawn({ 'command': command, 'layout': g:oterm })
 endfunction
 
-function s:Print_err(msg)
+function! s:Print_err(msg)
   echohl ErrorMsg
   echom a:msg
   echohl None
