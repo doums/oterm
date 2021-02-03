@@ -238,10 +238,11 @@ function! oterm#spawn(...)
 endfunction
 
 function! oterm#new(...)
+  let opt = { 'layout': g:oterm }
   if a:0 > 0
-    let command = split(a:1)
+    let opt.command = a:1
   endif
-  call oterm#spawn({ 'command': command, 'layout': g:oterm })
+  call oterm#spawn(opt)
 endfunction
 
 function! s:Print_err(msg)
