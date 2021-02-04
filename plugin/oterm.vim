@@ -29,7 +29,7 @@ augroup oterm
     autocmd BufLeave,TermClose * call oterm#restore_window(expand('<afile>'))
   else
     autocmd TerminalWinOpen,BufEnter * call oterm#init_window(expand('<afile>'))
-    autocmd BufLeave,BufDelete * call oterm#init_window(expand('<afile>'))
+    autocmd BufLeave,BufDelete * call oterm#restore_window(expand('<afile>'))
   endif
 augroup END
 

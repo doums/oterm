@@ -1,6 +1,6 @@
 ## OTerm
 
-A [neovim](https://neovim.io/) plugin to quickly open terminals.
+A [n](https://neovim.io/)/[vim](https://www.vim.org/) plugin to quickly open terminals.
 
 OTerm is a plugin that allows you to open terminals quickly by placing them according to a layout and in an adaptive way.\
 It also allows you to run external process direclty in the spawned terminal.
