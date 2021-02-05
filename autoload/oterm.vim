@@ -142,10 +142,10 @@ function! oterm#restore_window(bufname)
   endif
 endfunction
 
-function! s:on_exit(job, status, ...)
+function! s:exit_cb(job, status, ...)
   let term_idx = s:term_index(bufnr())
   if term_idx == -1
-    throw 'on_exit callback: terminal data not found for bufnr '.bufnr()
+    throw 'exit_cb: terminal data not found for bufnr '.bufnr()
   endif
   let terminal = s:terminals[term_idx]
   call win_gotoid(terminal.prev_winid)
@@ -154,7 +154,7 @@ function! s:on_exit(job, status, ...)
   endif
   let i = 0
   if has_key(terminal, 'cb')
-    call terminal.cb(a:status)
+    call terminal.cb(a:job, a:status)
   endif
   call remove(s:terminals, term_idx)
 endfunction
@@ -188,7 +188,7 @@ endfunction
 
 function! s:create_term(command, bufname)
   if has('nvim')
-    call termopen(a:command, { 'on_exit': funcref('s:on_exit') })
+    call termopen(a:command, { 'on_exit': funcref('s:exit_cb') })
     execute 'file '.a:bufname
     let bufnr = bufnr()
     startinsert
@@ -196,7 +196,7 @@ function! s:create_term(command, bufname)
     let bufnr = term_start(a:command, {
           \ 'curwin': 1,
           \ 'term_name': a:bufname,
-          \ 'exit_cb': funcref('s:on_exit'),
+          \ 'exit_cb': funcref('s:exit_cb'),
           \ 'term_finish': 'close',
           \ 'term_kill': 'SIGKILL'
           \ })
