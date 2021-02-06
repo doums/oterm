@@ -149,7 +149,7 @@ function! s:exit_cb(job, status, ...)
   endif
   let terminal = s:terminals[term_idx]
   call win_gotoid(terminal.prev_winid)
-  if has('nvim')
+  if bufexists(terminal.bufnr)
     execute terminal.bufnr.'bdelete!'
   endif
   let i = 0
