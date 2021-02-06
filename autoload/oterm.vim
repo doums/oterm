@@ -93,7 +93,7 @@ function! s:find_valid_name(name, ...)
 endfunction
 
 function! oterm#init_window(bufname)
-  if &buftype != 'terminal' || getbufvar(a:bufname, '&filetype') != 'oterm'
+  if &buftype != 'terminal'
     return
   endif
   let terminal = s:find_term(a:bufname)
@@ -119,7 +119,7 @@ function! oterm#init_window(bufname)
 endfunction
 
 function! oterm#restore_window(bufname)
-  if &buftype != 'terminal' || getbufvar(a:bufname, '&filetype') != 'oterm'
+  if &buftype != 'terminal'
     return
   endif
   if !s:any_term(a:bufname)
@@ -221,9 +221,11 @@ function! oterm#spawn(...) abort
   let layout = deepcopy(g:oterm)
   let command = split(&shell)
   let name = s:find_valid_name('oterm')
+  let filetype = 'oterm'
   if a:0 > 0
     let layout = get(a:1, 'layout', layout)
     let cmd = get(a:1, 'command')
+    let filetype = get(a:1, 'filetype', 'oterm')
     if !empty(cmd)
       if type(cmd) == v:t_list
         let cmd = join(cmd)
@@ -240,7 +242,7 @@ function! oterm#spawn(...) abort
   endif
   call s:create_window(layout)
   let bufnr = s:create_term(command, name)
-  call setbufvar(bufnr, '&filetype', 'oterm')
+  call setbufvar(bufnr, '&filetype', filetype)
   let terminal.layout = layout
   let terminal.bufname = name
   let terminal.bufnr = bufnr

@@ -73,6 +73,9 @@ A dictionary, the terminal window layout, same as `g:oterm`. Optional, default t
 #### `name`
 A string, the name of the terminal buffer. Optional, default to `oterm`.
 
+#### `filetype`
+A string, the `filetype` of the terminal buffer. Optional, default to `oterm`.
+
 ### license
 Mozilla Public License 2.0
 
