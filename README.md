@@ -62,7 +62,7 @@ call oterm#spawn({ 'command': 'nnn', 'callback': funcref('s:exit_cb'), 'layout':
 ```
 
 #### `command`
-A string, the command and its arguments. Optional, default to the user shell.
+A string or a list of string, the command and its arguments. Optional, default to the user shell.
 
 #### `callback`
 A funcref, a function that will be called when the process exits. Receives as arguments the job data and the exit status. Optional.

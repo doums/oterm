@@ -210,8 +210,10 @@ function! oterm#spawn(...) abort
       call s:print_err('oterm#spawn, wrong argument type, expected a dictionary')
       return
     endif
-    if has_key(a:1, 'command') && type(a:1.command) != v:t_string
-      call s:print_err('oterm#spawn, wrong type for key "command", expected a String')
+    if has_key(a:1, 'command')
+          \&& type(a:1.command) != v:t_string
+          \&& type(a:1.command) != v:t_list
+      call s:print_err('oterm#spawn, wrong type for key "command", expected a string or a list of string')
       return
     endif
   endif
@@ -223,6 +225,9 @@ function! oterm#spawn(...) abort
     let layout = get(a:1, 'layout', layout)
     let cmd = get(a:1, 'command')
     if !empty(cmd)
+      if type(cmd) == v:t_list
+        let cmd = join(cmd)
+      endif
       let command = split(&shell) + split(&shellcmdflag) + [cmd]
     endif
     let Cb = get(a:1, 'callback')
