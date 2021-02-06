@@ -58,11 +58,11 @@ nmap <Leader>o <Plug>OTerm
 
 ### vimscript API
 ```
-call oterm#spawn({ 'command': ['nnn'], 'callback': funcref('s:exit_cb'), 'layout': { 'left': 40, 'min': 50 }, 'name': 'nnn' })
+call oterm#spawn({ 'command': 'nnn', 'callback': funcref('s:exit_cb'), 'layout': { 'left': 40, 'min': 50 }, 'name': 'nnn' })
 ```
 
 #### `command`
-A list of string, the command and its arguments. Optional, default to the user shell.
+A string, the command and its arguments. Optional, default to the user shell.
 
 #### `callback`
 A funcref, a function that will be called when the process exits. Receives as arguments the job data and the exit status. Optional.

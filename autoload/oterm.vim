@@ -13,7 +13,7 @@ let g:oterm_autoloaded = 1
 let s:terminals = []
 
 function! oterm#normalize_conf(layout)
-  if type(a:layout) != 4
+  if type(a:layout) != v:t_dict
     let a:layout = g:oterm_default
     return
   endif
@@ -204,10 +204,16 @@ function! s:create_term(command, bufname)
   return bufnr
 endfunction
 
-function! oterm#spawn(...)
-  if a:0 > 0 && type(a:1) != 4
-    call s:print_err('oterm#new_term, wrong argument type, expected a dictionary')
-    return
+function! oterm#spawn(...) abort
+  if a:0 > 0
+    if type(a:1) != v:t_dict
+      call s:print_err('oterm#spawn, wrong argument type, expected a dictionary')
+      return
+    endif
+    if has_key(a:1, 'command') && type(a:1.command) != v:t_string
+      call s:print_err('oterm#spawn, wrong type for key "command", expected a String')
+      return
+    endif
   endif
   let terminal = { 'prev_winid': win_getid() }
   let layout = deepcopy(g:oterm)
@@ -216,10 +222,8 @@ function! oterm#spawn(...)
   if a:0 > 0
     let layout = get(a:1, 'layout', layout)
     let cmd = get(a:1, 'command')
-    if empty(cmd)
-      let command = split(&shell)
-    else
-      let command = [&shell, &shellcmdflag, cmd]
+    if !empty(cmd)
+      let command = split(&shell) + split(&shellcmdflag) + [cmd]
     endif
     let Cb = get(a:1, 'callback')
     if !empty(Cb)
