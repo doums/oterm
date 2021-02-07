@@ -76,6 +76,9 @@ A string, the name of the terminal buffer. Optional, default to `oterm`.
 #### `filetype`
 A string, the `filetype` of the terminal buffer. Optional, default to `oterm`.
 
+#### return value
+The buffer number of the terminal.
+
 ### license
 Mozilla Public License 2.0
 

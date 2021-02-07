@@ -248,6 +248,7 @@ function! oterm#spawn(...) abort
   let terminal.bufnr = bufnr
   call add(s:terminals, terminal)
   call oterm#init_window(bufname())
+  return bufnr
 endfunction
 
 function! oterm#new(...)
