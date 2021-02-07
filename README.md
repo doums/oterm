@@ -30,7 +30,8 @@ The configuration is optional.
 let g:oterm = {
       \  'down': 40,
       \  'min': 10,
-      \  'tab': 0
+      \  'tab': 0,
+      \  'no_hide_status': 0
       \}
 ```
 
@@ -40,6 +41,8 @@ The value is the height or the width of the terminal window respectively for hor
 `min` The minimum number of lines or columns, depends on wheter splitted horizontally or vertically, below which the terminal will be spawned in a new tab.
 
 `tab` If equal to `1` the terminal will be spawned in a new tab regardless of the other properties.
+
+`no_hide_status` If equal to 1 do not hide the statusline when terminal is opened in a horizontal split or in a new tab.
 
 ### commands
 ```

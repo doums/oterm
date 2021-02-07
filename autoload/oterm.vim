@@ -102,10 +102,11 @@ function! oterm#init_window(bufname)
   endif
   echo ''
   let layout = get(terminal, 'layout', g:oterm)
-  if get(layout, 'tab', 0)
+  if !get(layout, 'no_hide_status', 0) && (
+        \   get(layout, 'tab', 0)
         \|| get(layout, 'auto_tab', 0)
         \|| has_key(layout, 'up')
-        \|| has_key(layout, 'down')
+        \|| has_key(layout, 'down'))
     let s:laststatus = &laststatus
     set laststatus=0
   endif
