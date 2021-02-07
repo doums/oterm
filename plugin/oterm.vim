@@ -2,13 +2,13 @@
 " License, v. 2.0. If a copy of the MPL was not distributed with this
 " file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
-let s:save_cpo = &cpo
-set cpo&vim
-
 if exists('g:oterm_loaded')
   finish
 endif
 let g:oterm_loaded = 1
+
+let s:save_cpo = &cpo
+set cpo&vim
 
 let g:oterm_default = {
       \  'down': 40,
