@@ -41,7 +41,7 @@ The value is the height or the width of the terminal window respectively for hor
 
 `tab` If equal to `1` the terminal will be spawned in a new tab regardless of the other properties.
 
-#### commands
+### commands
 ```
 :OTerm
 :Ot
@@ -51,7 +51,7 @@ You can direclty run a process in the spawned terminal
 :OTerm nnn
 ```
 
-### mapping
+### map
 ```
 nmap <Leader>o <Plug>OTerm
 ```
