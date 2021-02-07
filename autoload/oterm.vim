@@ -102,7 +102,10 @@ function! oterm#init_window(bufname)
   endif
   echo ''
   let layout = get(terminal, 'layout', g:oterm)
-  if get(layout, 'tab', 0) || has_key(layout, 'up') || has_key(layout, 'down')
+  if get(layout, 'tab', 0)
+        \|| get(layout, 'auto_tab', 0)
+        \|| has_key(layout, 'up')
+        \|| has_key(layout, 'down')
     let s:laststatus = &laststatus
     set laststatus=0
   endif
@@ -177,7 +180,7 @@ function! s:create_window(layout)
       if size >= a:layout.min
         execute cmd..size..'new'
       else
-        let a:layout.tab = 1
+        let a:layout.auto_tab = 1
         tabnew
       endif
       return
@@ -218,7 +221,7 @@ function! oterm#spawn(...) abort
     endif
   endif
   let terminal = { 'prev_winid': win_getid() }
-  let layout = deepcopy(g:oterm)
+  let layout = deepcopy(g:oterm, 1)
   let command = split(&shell)
   let name = s:find_valid_name('oterm')
   let filetype = 'oterm'
@@ -252,7 +255,7 @@ function! oterm#spawn(...) abort
 endfunction
 
 function! oterm#new(...)
-  let opt = { 'layout': g:oterm }
+  let opt = { 'layout': deepcopy(g:oterm, 1) }
   if a:0 > 0
     let opt.command = a:1
   endif
