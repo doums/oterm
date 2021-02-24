@@ -190,20 +190,28 @@ function! s:create_window(layout)
   throw 'Invalid layout!'
 endfunction
 
-function! s:create_term(command, bufname)
+function! s:create_term(command, opt)
   if has('nvim')
-    call termopen(a:command, { 'on_exit': funcref('s:exit_cb') })
-    execute 'file '.a:bufname
+    let options = { 'on_exit': funcref('s:exit_cb') }
+    if has_key(a:opt, 'cwd')
+      let options.cwd = a:opt.cwd
+    endif
+    call termopen(a:command, options)
+    execute 'file '.a:opt.name
     let bufnr = bufnr()
     startinsert
   else
-    let bufnr = term_start(a:command, {
+    let options = {
           \ 'curwin': 1,
-          \ 'term_name': a:bufname,
+          \ 'term_name': a:opt.name,
           \ 'exit_cb': funcref('s:exit_cb'),
           \ 'term_finish': 'close',
           \ 'term_kill': 'SIGKILL'
-          \ })
+          \ }
+    if has_key(a:opt, 'cwd')
+      let options.cwd = a:opt.cwd
+    endif
+    let bufnr = term_start(a:command, options)
   endif
   return bufnr
 endfunction
@@ -211,13 +219,13 @@ endfunction
 function! oterm#spawn(...) abort
   if a:0 > 0
     if type(a:1) != v:t_dict
-      call s:print_err('oterm#spawn, wrong argument type, expected a dictionary')
+      call s:print_err('oterm#spawn, wrong argument type, a dictionary expected')
       return
     endif
     if has_key(a:1, 'command')
           \&& type(a:1.command) != v:t_string
           \&& type(a:1.command) != v:t_list
-      call s:print_err('oterm#spawn, wrong type for key "command", expected a string or a list of string')
+      call s:print_err('oterm#spawn, wrong type for key "command", a string or a list of string expected')
       return
     endif
   endif
@@ -226,6 +234,7 @@ function! oterm#spawn(...) abort
   let command = split(&shell)
   let name = s:find_valid_name('oterm')
   let filetype = 'oterm'
+  let options = {}
   if a:0 > 0
     let layout = get(a:1, 'layout', layout)
     let cmd = get(a:1, 'command')
@@ -243,9 +252,18 @@ function! oterm#spawn(...) abort
     if has_key(a:1, 'name')
       let name = s:find_valid_name(a:1.name)
     endif
+    let cwd = get(a:1, 'cwd')
+    if !empty(cwd)
+      if !isdirectory(cwd)
+        call s:print_err('oterm#spawn, bad value for cwd, a valid directory expected')
+        return
+      endif
+      let options.cwd = cwd
+    endif
   endif
+  let options.name = name
   call s:create_window(layout)
-  let bufnr = s:create_term(command, name)
+  let bufnr = s:create_term(command, options)
   call setbufvar(bufnr, '&filetype', filetype)
   let terminal.layout = layout
   let terminal.bufname = name
