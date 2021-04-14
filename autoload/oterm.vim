@@ -114,10 +114,12 @@ function! oterm#init_window(bufname)
   let s:ruler = &ruler
   let s:showcmd = &showcmd
   let s:cmdheight = &cmdheight
+  let s:signcolumn = &signcolumn
   set noshowmode
   set noruler
   set noshowcmd
   set cmdheight=1
+  set signcolumn=no
   setlocal nonumber
   setlocal norelativenumber
 endfunction
@@ -143,6 +145,9 @@ function! oterm#restore_window(bufname)
   endif
   if exists('s:cmdheight')
     let &cmdheight = s:cmdheight
+  endif
+  if exists('s:signcolumn')
+    let &signcolumn = s:signcolumn
   endif
 endfunction
 
